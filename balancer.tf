@@ -30,3 +30,11 @@ resource "yandex_lb_network_load_balancer" "lamp-lb" {
     }
   }
 }
+
+output "load_balancer_ip" {
+  value = one(flatten([
+    for listener in yandex_lb_network_load_balancer.lamp-lb.listener : [
+      for spec in listener.external_address_spec : spec.address
+    ]
+  ]))
+}
