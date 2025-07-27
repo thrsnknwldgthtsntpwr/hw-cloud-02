@@ -102,7 +102,34 @@ resource "yandex_compute_instance_group" "lamp_group" {
 
  - Создать сетевой балансировщик.
  - Проверить работоспособность, удалив одну или несколько ВМ.
-4. (дополнительно)* Создать Application Load Balancer с использованием Instance group и проверкой состояния.
+```
+resource "yandex_lb_network_load_balancer" "lamp-lb" {
+  depends_on = [
+    yandex_resourcemanager_folder_iam_member.lamp-sa
+  ]
+  name = "lamp-lb"
+  listener {
+    name = "http-listener"
+    port = 80
+  }
+  attached_target_group {
+    target_group_id = yandex_compute_instance_group.lamp_group.load_balancer.0.target_group_id
+    healthcheck {
+      http_options {
+        port = 80
+        path = "/"
+      }
+    }
+  }
+}
+
+output "load_balancer_ip" {
+  value = yandex_lb_network_load_balancer.lamp-lb.listener[0].external_address_spec[0].address
+}
+```
+![img-1](img/img-1.png)
+![img-2](img/img-2.png)
+![img-3](img/img-3.png)
 
 Полезные документы:
 
