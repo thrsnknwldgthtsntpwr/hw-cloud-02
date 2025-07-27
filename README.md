@@ -17,6 +17,25 @@
  - Создать бакет в Object Storage с произвольным именем (например, _имя_студента_дата_).
  - Положить в бакет файл с картинкой.
  - Сделать файл доступным из интернета.
+
+ ```
+ resource "yandex_storage_bucket" "nikiforov-roman-2025-07-27" {
+  bucket = "nikiforov-roman-2025-07-27"
+  anonymous_access_flags {
+    read = true
+    list = false
+    config_read = false
+  }
+  folder_id = "b1g8idjusu652hr2ocgh"
+  default_storage_class = "ICE"
+}
+
+resource "yandex_storage_object" "image" {
+  bucket = yandex_storage_bucket.nikiforov-roman-2025-07-27.bucket
+  key    = "image.png"
+  source = "./Screenshot_1.png"
+}
+ ```
  
 2. Создать группу ВМ в public подсети фиксированного размера с шаблоном LAMP и веб-страницей, содержащей ссылку на картинку из бакета:
 
