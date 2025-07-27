@@ -45,6 +45,9 @@ resource "yandex_storage_object" "image" {
  - Настроить проверку состояния ВМ.
 ```
 resource "yandex_compute_instance_group" "lamp_group" {
+  depends_on = [
+    yandex_resourcemanager_folder_iam_member.lamp-sa
+  ]
   name = "lamp-group"
   service_account_id = yandex_iam_service_account.lamp-sa.id
   instance_template {
@@ -64,7 +67,7 @@ resource "yandex_compute_instance_group" "lamp_group" {
     }
     network_interface {
       subnet_ids = [yandex_vpc_subnet.public.id]
-      nat       = true
+      nat = true
     }
     metadata = {
       user-data = <<-EOF
@@ -83,11 +86,8 @@ resource "yandex_compute_instance_group" "lamp_group" {
     zones = ["ru-central1-a"]
   }
   deploy_policy {
-    max_creating = 3
-    max_deleting = 3
     max_unavailable = 3
     max_expansion = 0
-    startup_duration = 30
   }
   health_check {
     http_options {
